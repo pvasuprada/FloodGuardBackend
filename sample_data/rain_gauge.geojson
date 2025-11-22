@@ -1,0 +1,74 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-122.4194, 37.7749]
+      },
+      "properties": {
+        "gauge_id": "RG001",
+        "name": "Rain Gauge Station 1",
+        "location": "Downtown",
+        "rainfall_mm": 45.5,
+        "rainfall_24h_mm": 120.3,
+        "timestamp": "2024-01-15T12:00:00Z",
+        "status": "active",
+        "elevation_m": 15.2
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-122.4094, 37.7849]
+      },
+      "properties": {
+        "gauge_id": "RG002",
+        "name": "Rain Gauge Station 2",
+        "location": "Park Area",
+        "rainfall_mm": 38.2,
+        "rainfall_24h_mm": 95.7,
+        "timestamp": "2024-01-15T12:00:00Z",
+        "status": "active",
+        "elevation_m": 18.5
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-122.4294, 37.7649]
+      },
+      "properties": {
+        "gauge_id": "RG003",
+        "name": "Rain Gauge Station 3",
+        "location": "Residential Zone",
+        "rainfall_mm": 52.1,
+        "rainfall_24h_mm": 135.8,
+        "timestamp": "2024-01-15T12:00:00Z",
+        "status": "active",
+        "elevation_m": 12.3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-122.4144, 37.7799]
+      },
+      "properties": {
+        "gauge_id": "RG004",
+        "name": "Rain Gauge Station 4",
+        "location": "Industrial Area",
+        "rainfall_mm": 41.8,
+        "rainfall_24h_mm": 110.2,
+        "timestamp": "2024-01-15T12:00:00Z",
+        "status": "active",
+        "elevation_m": 20.1
+      }
+    }
+  ]
+}
+

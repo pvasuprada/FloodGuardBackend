@@ -1,0 +1,20 @@
+# Configuration file for FloodGuard Backend
+# Set data_source to 'AWS' or 'local'
+
+data_source: "local" # Options: 'AWS' or 'local'
+
+# AWS Configuration (sample credentials - update later)
+aws:
+  region: "us-east-1"
+  access_key_id: "AKIAIOSFODNN7EXAMPLE"
+  secret_access_key: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+  s3_bucket: "floodguard-data"
+  dynamodb_table_reported_floods: "ReportedFloods"
+  dynamodb_table_rain_gauge: "RainGauge"
+  s3_geojson_key: "data/geojson/flood_data.geojson"
+
+# Local Configuration
+local:
+  geojson_path: "sample_data/floodrisk.geojson"
+  reported_floods_path: "sample_data/heatmap.geojson"
+  rain_gauge_path: "sample_data/rain_gauge.geojson"
