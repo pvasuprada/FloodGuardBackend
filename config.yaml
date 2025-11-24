@@ -1,7 +1,18 @@
 # Configuration file for FloodGuard Backend
-# Set data_source to 'AWS' or 'local'
+# Set data_source to 'AWS', 'local', or 'postgresql'
 
-data_source: "local" # Options: 'AWS' or 'local'
+data_source: "postgresql" # Options: 'AWS', 'local', or 'postgresql'
+
+# PostgreSQL Configuration
+postgresql:
+  host: "localhost"
+  port: 5432
+  database: "FloodGuard"
+  user: "postgres"
+  password: "root" # Update with your actual password
+  # Connection pool settings (optional)
+  min_connections: 1
+  max_connections: 10
 
 # AWS Configuration (sample credentials - update later)
 aws:
@@ -13,7 +24,7 @@ aws:
   dynamodb_table_rain_gauge: "RainGauge"
   s3_geojson_key: "data/geojson/flood_data.geojson"
 
-# Local Configuration
+# Local Configuration (for floodrisk.geojson only - API #1)
 local:
   geojson_path: "sample_data/floodrisk.geojson"
   reported_floods_path: "sample_data/reported_floods.json"
