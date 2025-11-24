@@ -1534,6 +1534,66 @@
       "properties": {
         "intensity": 2.1418737392783447
       }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          89.6523,
+          17.4485
+        ]
+      },
+      "properties": {
+        "id": "8af4b601-4490-443b-a6d8-21b1f214a8a4",
+        "location": "Hyderabad",
+        "severity": "medium",
+        "description": "Flooding here",
+        "reported_by": "Vasu",
+        "timestamp": "2025-11-23T07:16:06.719219Z",
+        "status": "active",
+        "photo_url": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          89.6523,
+          17.4485
+        ]
+      },
+      "properties": {
+        "id": "0b453c26-c491-4443-98fb-bbbb7a2ae52d",
+        "location": "Hyderabad",
+        "severity": "medium",
+        "description": "Flooding here",
+        "reported_by": "Vasu",
+        "timestamp": "2025-11-23T07:16:11.886880Z",
+        "status": "active",
+        "photo_url": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          0.0,
+          0.0
+        ]
+      },
+      "properties": {
+        "id": "ca2c7c61-2daa-423b-858e-ed00e74d9c02",
+        "location": "Hyderabad",
+        "severity": "low",
+        "description": "check",
+        "reported_by": "Vasu",
+        "timestamp": "2025-11-23T07:23:01.701875Z",
+        "status": "active",
+        "photo_url": null
+      }
     }
   ]
 }

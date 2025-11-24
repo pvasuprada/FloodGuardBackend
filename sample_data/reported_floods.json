@@ -1,0 +1,50 @@
+[
+  {
+    "id": "1",
+    "location": "Banjara Hills",
+    "severity": "Moderate",
+    "category": "Flooding",
+    "description": "Water accumulation near Banjara Hills metro station. Road partially blocked.",
+    "reporter": "Raj Kumar",
+    "confidence": 85,
+    "timestamp": "2h ago",
+    "verified": true,
+    "imageUrl": "/api/placeholder/300/200",
+    "coordinates": {
+      "lat": 17.4065,
+      "lng": 78.4772
+    }
+  },
+  {
+    "id": "2",
+    "location": "Kukatpally",
+    "severity": "High",
+    "category": "Flooding",
+    "description": "Severe flooding in residential areas. Water level rising rapidly.",
+    "reporter": "Priya Sharma",
+    "confidence": 92,
+    "timestamp": "1h ago",
+    "verified": true,
+    "imageUrl": "/api/placeholder/300/200",
+    "coordinates": {
+      "lat": 17.4849,
+      "lng": 78.4138
+    }
+  },
+  {
+    "id": "3",
+    "location": "Madhapur",
+    "severity": "Low",
+    "category": "Waterlogging",
+    "description": "Minor waterlogging on main road near IT companies.",
+    "reporter": "Anonymous",
+    "confidence": 78,
+    "timestamp": "3h ago",
+    "verified": false,
+    "coordinates": {
+      "lat": 17.4482,
+      "lng": 78.3908
+    }
+  }
+]
+

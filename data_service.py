@@ -73,6 +73,40 @@ class DataService:
                 print(f"Error reading local GeoJSON: {e}")
                 return None
     
+    def _convert_flood_report_to_geojson(self, report):
+        """Convert a flood report object to GeoJSON Feature"""
+        coords = report.get('coordinates', {})
+        lat = coords.get('lat', 0)
+        lng = coords.get('lng', 0)
+        
+        # Map fields to GeoJSON properties
+        properties = {
+            "id": report.get('id', ''),
+            "location": report.get('location', ''),
+            "severity": report.get('severity', '').lower(),
+            "category": report.get('category', ''),
+            "description": report.get('description', ''),
+            "reported_by": report.get('reporter', 'Anonymous'),
+            "confidence": report.get('confidence', 0),
+            "timestamp": report.get('timestamp', ''),
+            "verified": report.get('verified', False),
+            "status": "active" if report.get('verified', False) else "pending"
+        }
+        
+        # Add imageUrl if present
+        if 'imageUrl' in report:
+            properties['photo_url'] = report['imageUrl']
+        
+        feature = {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [lng, lat]
+            },
+            "properties": properties
+        }
+        return feature
+    
     def fetch_reported_floods(self):
         """Fetch reported floods from AWS DynamoDB or local file and convert to GeoJSON"""
         if self.data_source == 'AWS':
@@ -84,8 +118,175 @@ class DataService:
                 # Convert DynamoDB items to GeoJSON
                 features = []
                 for item in items:
-                    # Assuming DynamoDB items have latitude, longitude, and other fields
+                    # Handle different possible field names from DynamoDB
+                    lat = float(item.get('latitude') or item.get('lat') or item.get('coordinates', {}).get('lat', 0))
+                    lng = float(item.get('longitude') or item.get('lng') or item.get('coordinates', {}).get('lng', 0))
+                    
                     feature = {
+                        "type": "Feature",
+                        "geometry": {
+                            "type": "Point",
+                            "coordinates": [lng, lat]
+                        },
+                        "properties": {
+                            k: v for k, v in item.items() 
+                            if k not in ['latitude', 'longitude', 'lat', 'lng', 'coordinates']
+                        }
+                    }
+                    features.append(feature)
+                
+                geojson = {
+                    "type": "FeatureCollection",
+                    "features": features
+                }
+                return geojson
+            except ClientError as e:
+                print(f"Error fetching from DynamoDB: {e}")
+                return None
+        else:
+            # Local mode - read from sample data JSON and convert to GeoJSON
+            local_config = self.config.get('local', {})
+            floods_path = local_config.get('reported_floods_path', 'sample_data/reported_floods.json')
+            try:
+                # Try to read as structured JSON first
+                with open(floods_path, 'r') as f:
+                    data = json.load(f)
+                
+                # Check if it's already GeoJSON or structured array
+                if isinstance(data, dict) and data.get('type') == 'FeatureCollection':
+                    # Already GeoJSON
+                    return data
+                elif isinstance(data, list):
+                    # Structured array - convert to GeoJSON
+                    features = []
+                    for report in data:
+                        feature = self._convert_flood_report_to_geojson(report)
+                        features.append(feature)
+                    
+                    geojson = {
+                        "type": "FeatureCollection",
+                        "features": features
+                    }
+                    return geojson
+                else:
+                    return None
+            except FileNotFoundError:
+                print(f"Error: Reported floods file not found at {floods_path}")
+                return None
+            except json.JSONDecodeError as e:
+                print(f"Error: Invalid JSON in reported floods file: {e}")
+                return None
+            except Exception as e:
+                print(f"Error reading local reported floods: {e}")
+                return None
+    
+    def fetch_reported_floods_structured(self):
+        """Fetch reported floods as structured array format (for UI display)"""
+        if self.data_source == 'AWS':
+            try:
+                table = self.dynamodb.Table(self.dynamodb_table_reported_floods)
+                response = table.scan()
+                items = response.get('Items', [])
+                
+                # Convert DynamoDB items to structured format
+                reports = []
+                for item in items:
+                    lat = float(item.get('latitude') or item.get('lat') or item.get('coordinates', {}).get('lat', 0))
+                    lng = float(item.get('longitude') or item.get('lng') or item.get('coordinates', {}).get('lng', 0))
+                    
+                    report = {
+                        "id": str(item.get('id', '')),
+                        "location": str(item.get('location', '')),
+                        "severity": str(item.get('severity', '')).capitalize(),
+                        "category": str(item.get('category', 'Flooding')),
+                        "description": str(item.get('description', '')),
+                        "reporter": str(item.get('reported_by') or item.get('reporter', 'Anonymous')),
+                        "confidence": int(item.get('confidence', 0)),
+                        "timestamp": str(item.get('timestamp', '')),
+                        "verified": bool(item.get('verified', False)),
+                        "coordinates": {
+                            "lat": lat,
+                            "lng": lng
+                        }
+                    }
+                    
+                    # Add imageUrl if present
+                    if 'photo_url' in item or 'imageUrl' in item:
+                        report['imageUrl'] = str(item.get('photo_url') or item.get('imageUrl', ''))
+                    
+                    reports.append(report)
+                
+                return reports
+            except ClientError as e:
+                print(f"Error fetching from DynamoDB: {e}")
+                return None
+        else:
+            # Local mode - read from sample data JSON
+            local_config = self.config.get('local', {})
+            floods_path = local_config.get('reported_floods_path', 'sample_data/reported_floods.json')
+            try:
+                with open(floods_path, 'r') as f:
+                    data = json.load(f)
+                
+                # If it's already a structured array, return it
+                if isinstance(data, list):
+                    return data
+                # If it's GeoJSON, convert to structured format
+                elif isinstance(data, dict) and data.get('type') == 'FeatureCollection':
+                    reports = []
+                    for feature in data.get('features', []):
+                        props = feature.get('properties', {})
+                        coords = feature.get('geometry', {}).get('coordinates', [0, 0])
+                        
+                        report = {
+                            "id": str(props.get('id', '')),
+                            "location": str(props.get('location', '')),
+                            "severity": str(props.get('severity', '')).capitalize(),
+                            "category": str(props.get('category', 'Flooding')),
+                            "description": str(props.get('description', '')),
+                            "reporter": str(props.get('reported_by') or props.get('reporter', 'Anonymous')),
+                            "confidence": int(props.get('confidence', 0)),
+                            "timestamp": str(props.get('timestamp', '')),
+                            "verified": bool(props.get('verified', False)),
+                            "coordinates": {
+                                "lat": float(coords[1]) if len(coords) > 1 else 0,
+                                "lng": float(coords[0]) if len(coords) > 0 else 0
+                            }
+                        }
+                        
+                        if 'photo_url' in props:
+                            report['imageUrl'] = str(props['photo_url'])
+                        
+                        reports.append(report)
+                    
+                    return reports
+                else:
+                    return None
+            except FileNotFoundError:
+                print(f"Error: Reported floods file not found at {floods_path}")
+                return None
+            except json.JSONDecodeError as e:
+                print(f"Error: Invalid JSON in reported floods file: {e}")
+                return None
+            except Exception as e:
+                print(f"Error reading local reported floods: {e}")
+                return None
+    
+    def fetch_reported_floods_by_location(self, location_filter):
+        """Fetch reported floods filtered by location from AWS DynamoDB or local file and convert to GeoJSON"""
+        if self.data_source == 'AWS':
+            try:
+                table = self.dynamodb.Table(self.dynamodb_table_reported_floods)
+                response = table.scan()
+                items = response.get('Items', [])
+                
+                # Convert DynamoDB items to GeoJSON and filter by location
+                features = []
+                for item in items:
+                    # Check if location matches the filter (case-insensitive)
+                    item_location = str(item.get('location', '')).lower()
+                    if location_filter.lower() in item_location or item_location in location_filter.lower():
+                        feature = {
                         "type": "Feature",
                         "geometry": {
                             "type": "Point",
@@ -99,7 +300,7 @@ class DataService:
                             if k not in ['latitude', 'longitude']
                         }
                     }
-                    features.append(feature)
+                        features.append(feature)
                 
                 geojson = {
                     "type": "FeatureCollection",
@@ -117,6 +318,18 @@ class DataService:
                 # Read GeoJSON file directly as JSON
                 with open(floods_path, 'r') as f:
                     geojson_data = json.load(f)
+                
+                # Filter features by location
+                if 'features' in geojson_data:
+                    filtered_features = []
+                    for feature in geojson_data['features']:
+                        if 'properties' in feature and 'location' in feature['properties']:
+                            feature_location = str(feature['properties']['location']).lower()
+                            if location_filter.lower() in feature_location or feature_location in location_filter.lower():
+                                filtered_features.append(feature)
+                    
+                    geojson_data['features'] = filtered_features
+                
                 return geojson_data
             except FileNotFoundError:
                 print(f"Error: Reported floods file not found at {floods_path}")

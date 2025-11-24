@@ -16,5 +16,5 @@ aws:
 # Local Configuration
 local:
   geojson_path: "sample_data/floodrisk.geojson"
-  reported_floods_path: "sample_data/heatmap.geojson"
+  reported_floods_path: "sample_data/reported_floods.json"
   rain_gauge_path: "sample_data/rain_gauge.geojson"
